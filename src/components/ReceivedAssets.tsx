@@ -34,6 +34,45 @@ function markAsSeen(assetId: string) {
 export function ReceivedAssets({ assets }: ReceivedAssetsProps) {
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
   const [seenIds, setSeenIds] = useState<Set<string>>(getSeenAssets);
+  const prevAssetIds = useRef<Set<string>>(new Set(assets.map(a => a.id)));
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // Play notification sound when new assets arrive
+  useEffect(() => {
+    const currentIds = new Set(assets.map(a => a.id));
+    const newIds = assets.filter(a => !prevAssetIds.current.has(a.id) && !seenIds.has(a.id));
+    prevAssetIds.current = currentIds;
+
+    if (newIds.length > 0) {
+      playAssetChime();
+    }
+  }, [assets]);
+
+  function playAssetChime() {
+    try {
+      const ctx = audioCtxRef.current || new AudioContext();
+      audioCtxRef.current = ctx;
+      const now = ctx.currentTime;
+
+      // Mystical three-note descending chime
+      const notes = [880, 659.25, 523.25]; // A5, E5, C5
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + i * 0.12);
+        gain.gain.linearRampToValueAtTime(0.25, now + i * 0.12 + 0.03);
+        gain.gain.linearRampToValueAtTime(0, now + i * 0.12 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.12);
+        osc.stop(now + i * 0.12 + 0.4);
+      });
+    } catch {
+      // Audio not available
+    }
+  }
 
   const handleOpen = useCallback((asset: Asset) => {
     setPreviewAsset(asset);
