@@ -14,7 +14,165 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      session_assets: {
+        Row: {
+          asset_type: string
+          created_at: string
+          description: string | null
+          file_url: string | null
+          id: string
+          session_id: string
+          shared_with: string[]
+          title: string
+        }
+        Insert: {
+          asset_type?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          session_id: string
+          shared_with?: string[]
+          title: string
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          session_id?: string
+          shared_with?: string[]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_assets_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_notes: {
+        Row: {
+          author_id: string
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          note_type: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          author_name: string
+          content?: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notes_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_players: {
+        Row: {
+          created_at: string
+          id: string
+          initiative: number | null
+          is_active: boolean
+          player_name: string
+          player_token: string
+          session_id: string
+          status_effects: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          initiative?: number | null
+          is_active?: boolean
+          player_name: string
+          player_token: string
+          session_id: string
+          status_effects?: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          initiative?: number | null
+          is_active?: boolean
+          player_name?: string
+          player_token?: string
+          session_id?: string
+          status_effects?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_players_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          combat_started: boolean
+          created_at: string
+          creator_id: string
+          current_turn_player_id: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          join_code: string
+          name: string
+        }
+        Insert: {
+          combat_started?: boolean
+          created_at?: string
+          creator_id: string
+          current_turn_player_id?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          join_code: string
+          name: string
+        }
+        Update: {
+          combat_started?: boolean
+          created_at?: string
+          creator_id?: string
+          current_turn_player_id?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          join_code?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

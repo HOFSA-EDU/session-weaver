@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "./pages/Landing";
+import CreateSession from "./pages/CreateSession";
 import DMDashboard from "./pages/DMDashboard";
 import JoinSession from "./pages/JoinSession";
 import PlayerView from "./pages/PlayerView";
@@ -17,9 +18,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/dm" element={<DMDashboard />} />
+          <Route path="/create" element={<CreateSession />} />
+          <Route path="/dm/:sessionId" element={<DMDashboard />} />
           <Route path="/join" element={<JoinSession />} />
-          <Route path="/player" element={<PlayerView />} />
+          <Route path="/player/:sessionId" element={<PlayerView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

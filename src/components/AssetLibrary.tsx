@@ -46,10 +46,13 @@ export function AssetLibrary({ assets, onUpload, onSendAsset }: AssetLibraryProp
                 key={asset.id}
                 className="group relative aspect-video rounded-lg bg-surface overflow-hidden card-hover cursor-pointer"
               >
-                {/* Placeholder for image */}
-                <div className="absolute inset-0 bg-gradient-to-br from-surface-hover to-surface flex items-center justify-center">
-                  <Icon className="w-8 h-8 text-muted-foreground/30" />
-                </div>
+                {asset.imageUrl ? (
+                  <img src={asset.imageUrl} alt={asset.title} className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-surface-hover to-surface flex items-center justify-center">
+                    <Icon className="w-8 h-8 text-muted-foreground/30" />
+                  </div>
+                )}
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
                 {/* Content */}
