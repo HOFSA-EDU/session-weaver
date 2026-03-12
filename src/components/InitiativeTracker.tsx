@@ -24,9 +24,16 @@ export function InitiativeTracker({ players, onNextTurn, onClearFocus, onMovePla
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider">Turn Order</h3>
         {onNextTurn && (
-          <button onClick={onNextTurn} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium btn-press">
-            <SkipForward className="w-3 h-3" /> Next Turn
-          </button>
+          <div className="flex gap-1.5">
+            {onClearFocus && players.some(p => p.isActive) && (
+              <button onClick={onClearFocus} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-hover text-muted-foreground text-xs font-medium btn-press" title="Clear focus">
+                <EyeOff className="w-3 h-3" />
+              </button>
+            )}
+            <button onClick={onNextTurn} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium btn-press">
+              <SkipForward className="w-3 h-3" /> Next Turn
+            </button>
+          </div>
         )}
       </div>
 
