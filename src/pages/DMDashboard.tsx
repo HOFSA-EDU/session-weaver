@@ -9,7 +9,7 @@ import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
-  useUpdatePlayer, useRemovePlayer, useCreateAsset, useCreateNote,
+  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useCreateNote,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -39,6 +39,7 @@ export default function DMDashboard() {
   const updatePlayer = useUpdatePlayer();
   const removePlayer = useRemovePlayer();
   const createAsset = useCreateAsset();
+  const updateAsset = useUpdateAsset();
   const createNote = useCreateNote();
 
   if (sessionLoading) {
@@ -182,6 +183,9 @@ export default function DMDashboard() {
     })),
     onUpload: handleUpload,
     onSendAsset: handleSendAsset,
+    onUpdateType: (assetId: string, type: string) => {
+      updateAsset.mutate({ id: assetId, sessionId: sessionId!, asset_type: type });
+    },
   };
 
   const noteProps = {

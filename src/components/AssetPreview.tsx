@@ -1,13 +1,31 @@
+import { useState } from "react";
 import { Asset } from "@/lib/mock-data";
-import { X, ExternalLink, ZoomIn } from "lucide-react";
+import { X, ExternalLink, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const ASSET_TYPES: { value: Asset['type']; label: string }[] = [
+  { value: 'map', label: 'Map' },
+  { value: 'letter', label: 'Letter' },
+  { value: 'artefact', label: 'Artefact' },
+  { value: 'clue', label: 'Clue' },
+  { value: 'handout', label: 'Handout' },
+];
+
+const typeColors: Record<string, string> = {
+  map: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  letter: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  clue: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  handout: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  artefact: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+};
 
 interface AssetPreviewProps {
   asset: Asset | null;
   onClose: () => void;
+  onUpdateType?: (assetId: string, type: Asset['type']) => void;
 }
 
-export function AssetPreview({ asset, onClose }: AssetPreviewProps) {
+export function AssetPreview({ asset, onClose, onUpdateType }: AssetPreviewProps) {
   if (!asset) return null;
 
   const openInNewTab = () => {
@@ -26,10 +44,8 @@ export function AssetPreview({ asset, onClose }: AssetPreviewProps) {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={onClose}
         >
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-background/90 backdrop-blur-md" />
 
-          {/* Content */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -61,6 +77,28 @@ export function AssetPreview({ asset, onClose }: AssetPreviewProps) {
                 </button>
               </div>
             </div>
+
+            {/* Type Labels */}
+            {onUpdateType && (
+              <div className="flex items-center gap-2 mb-3">
+                <Tag className="w-4 h-4 text-muted-foreground" />
+                <div className="flex flex-wrap gap-1.5">
+                  {ASSET_TYPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => onUpdateType(asset.id, value)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-all btn-press ${
+                        asset.type === value
+                          ? typeColors[value]
+                          : 'bg-surface border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Image */}
             {asset.imageUrl ? (
