@@ -191,14 +191,6 @@ export default function DMDashboard() {
     onDeleteAsset: (assetId: string) => {
       deleteAsset.mutate({ id: assetId, sessionId: sessionId! });
     },
-    onMoveToFolder: (assetId: string, folder: string | null) => {
-      updateAsset.mutate({ id: assetId, sessionId: sessionId!, folder });
-    },
-    onCreateFolder: (folderName: string) => {
-      // Folders are virtual — derived from asset.folder values
-      // We create a placeholder asset to establish the folder, or just assign folder to existing assets
-      toast.success(`Folder "${folderName}" created`);
-    },
   };
 
   const noteProps = {

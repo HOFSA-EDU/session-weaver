@@ -1,13 +1,13 @@
 import { Asset } from "@/lib/mock-data";
-import { X, ExternalLink, Tag, Trash2, FolderInput } from "lucide-react";
+import { X, ExternalLink, Tag, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ASSET_TYPES: { value: Asset['type']; label: string }[] = [
+  { value: 'handout', label: 'Handout' },
   { value: 'map', label: 'Map' },
   { value: 'letter', label: 'Letter' },
   { value: 'artefact', label: 'Artefact' },
   { value: 'clue', label: 'Clue' },
-  { value: 'handout', label: 'Handout' },
 ];
 
 const typeColors: Record<string, string> = {
@@ -23,12 +23,9 @@ interface AssetPreviewProps {
   onClose: () => void;
   onUpdateType?: (assetId: string, type: Asset['type']) => void;
   onDeleteAsset?: (assetId: string) => void;
-  folders?: string[];
-  currentFolder?: string | null;
-  onMoveToFolder?: (assetId: string, folder: string | null) => void;
 }
 
-export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, folders = [], currentFolder, onMoveToFolder }: AssetPreviewProps) {
+export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset }: AssetPreviewProps) {
   if (!asset) return null;
 
   const openInNewTab = () => {
@@ -57,7 +54,6 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, fold
             className="relative max-w-4xl w-full max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h2 className="font-display text-xl font-bold">{asset.title}</h2>
@@ -90,7 +86,6 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, fold
               </div>
             </div>
 
-            {/* Type Labels */}
             {onUpdateType && (
               <div className="flex items-center gap-2 mb-3">
                 <Tag className="w-4 h-4 text-muted-foreground" />
@@ -112,39 +107,6 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, fold
               </div>
             )}
 
-            {/* Move to folder */}
-            {onMoveToFolder && folders.length > 0 && (
-              <div className="flex items-center gap-2 mb-3">
-                <FolderInput className="w-4 h-4 text-muted-foreground" />
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    onClick={() => onMoveToFolder(asset.id, null)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all btn-press ${
-                      !asset.folder
-                        ? 'bg-primary/20 text-primary border-primary/30'
-                        : 'bg-surface border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    Root
-                  </button>
-                  {folders.map(f => (
-                    <button
-                      key={f}
-                      onClick={() => onMoveToFolder(asset.id, f)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-all btn-press ${
-                        asset.folder === f
-                          ? 'bg-primary/20 text-primary border-primary/30'
-                          : 'bg-surface border-transparent text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Image */}
             {asset.imageUrl ? (
               <div className="flex-1 min-h-0 rounded-2xl overflow-hidden bg-surface">
                 <img
