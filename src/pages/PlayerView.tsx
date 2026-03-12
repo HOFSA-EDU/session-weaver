@@ -5,6 +5,7 @@ import { ReceivedAssets } from "@/components/ReceivedAssets";
 import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
+import { useTurnSound } from "@/hooks/use-turn-sound";
 import { getPlayerSession } from "@/lib/session-utils";
 import { ArrowLeft } from "lucide-react";
 
@@ -23,6 +24,7 @@ export default function PlayerView() {
   const currentPlayer = players.find(p => p.id === playerInfo?.playerId);
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
+  const { soundEnabled, toggleSound } = useTurnSound(isMyTurn);
 
   const myAssets = assets.filter(
     a => a.shared_with.includes('all') || (currentPlayer && a.shared_with.includes(currentPlayer.id))
@@ -63,6 +65,8 @@ export default function PlayerView() {
         <TurnIndicator
           isYourTurn={isMyTurn}
           currentPlayerName={activePlayer?.player_name || currentPlayer?.player_name || 'someone'}
+          soundEnabled={soundEnabled}
+          onToggleSound={toggleSound}
         />
 
         {currentPlayer && currentPlayer.status_effects.length > 0 && (
