@@ -53,18 +53,16 @@ export default function DMDashboard() {
   }
 
   const handleNextTurn = async () => {
-    const sorted = [...players].filter(p => p.initiative !== null).sort((a, b) => (b.initiative ?? 0) - (a.initiative ?? 0));
-    if (sorted.length === 0) return;
-    const activeIndex = sorted.findIndex(p => p.is_active);
-    const nextIndex = (activeIndex + 1) % sorted.length;
+    if (players.length === 0) return;
+    const activeIndex = players.findIndex(p => p.is_active);
+    const nextIndex = (activeIndex + 1) % players.length;
     
-    // Deactivate all, activate next
-    for (const p of sorted) {
-      if (p.is_active || p.id === sorted[nextIndex].id) {
+    for (const p of players) {
+      if (p.is_active || p.id === players[nextIndex].id) {
         await updatePlayer.mutateAsync({
           id: p.id,
           sessionId: session.id,
-          is_active: p.id === sorted[nextIndex].id,
+          is_active: p.id === players[nextIndex].id,
         });
       }
     }
