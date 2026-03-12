@@ -263,6 +263,14 @@ export default function DMDashboard() {
           <NotesPanel {...noteProps} />
         </div>
       </div>
+      {shareAsset && (
+        <ShareAssetDialog
+          assetTitle={shareAsset.title}
+          players={players.map(p => ({ id: p.id, name: p.player_name }))}
+          onShare={handleShareConfirm}
+          onClose={() => setShareAssetId(null)}
+        />
+      )}
     </div>
   );
 }
