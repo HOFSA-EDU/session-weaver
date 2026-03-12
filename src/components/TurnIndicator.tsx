@@ -8,7 +8,8 @@ interface TurnIndicatorProps {
   onToggleSound?: () => void;
 }
 
-export function TurnIndicator({ isYourTurn, currentPlayerName }: TurnIndicatorProps) {
+export function TurnIndicator({ isYourTurn, currentPlayerName, soundEnabled, onToggleSound }: TurnIndicatorProps) {
+  const showSoundToggle = onToggleSound !== undefined;
   return (
     <AnimatePresence mode="wait">
       {isYourTurn ? (

@@ -24,6 +24,7 @@ export default function PlayerView() {
   const currentPlayer = players.find(p => p.id === playerInfo?.playerId);
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
+  const { soundEnabled, toggleSound } = useTurnSound(isMyTurn);
 
   const myAssets = assets.filter(
     a => a.shared_with.includes('all') || (currentPlayer && a.shared_with.includes(currentPlayer.id))
