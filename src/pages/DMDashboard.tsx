@@ -9,7 +9,7 @@ import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
-  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote,
+  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote, useUpdateNote, useDeleteNote,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
