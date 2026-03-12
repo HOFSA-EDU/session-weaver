@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ShareAssetDialog } from "@/components/ShareAssetDialog";
 import { SessionHeader } from "@/components/SessionHeader";
 import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { PlayerList } from "@/components/PlayerList";
