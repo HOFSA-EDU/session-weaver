@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Asset } from "@/lib/mock-data";
 import { Upload, Send, Map, FileText, Search as SearchIcon, Eye, Users, User, FolderPlus, Folder, ArrowLeft, Trash2 } from "lucide-react";
 import { AssetPreview } from "@/components/AssetPreview";
@@ -34,11 +34,11 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [dragOverFolder, setDragOverFolder] = useState<string | null | undefined>(undefined);
+  const dragAssetId = useRef<string | null>(null);
 
-  // Derive unique folder names from assets
   const folders = [...new Set(assets.map(a => a.folder).filter((f): f is string => !!f))];
 
-  // Filter assets for current view
   const visibleAssets = currentFolder
     ? assets.filter(a => a.folder === currentFolder)
     : assets.filter(a => !a.folder);
@@ -55,6 +55,49 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
     onDeleteAsset?.(assetId);
     setConfirmDeleteId(null);
     if (previewAsset?.id === assetId) setPreviewAsset(null);
+  };
+
+  // Drag handlers
+  const handleDragStart = (e: React.DragEvent, assetId: string) => {
+    dragAssetId.current = assetId;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', assetId);
+  };
+
+  const handleFolderDragOver = (e: React.DragEvent, folder: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverFolder(folder);
+  };
+
+  const handleRootDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverFolder(null);
+  };
+
+  const handleFolderDrop = (e: React.DragEvent, folder: string) => {
+    e.preventDefault();
+    setDragOverFolder(undefined);
+    const assetId = dragAssetId.current;
+    if (assetId && onMoveToFolder) {
+      onMoveToFolder(assetId, folder);
+    }
+    dragAssetId.current = null;
+  };
+
+  const handleRootDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverFolder(undefined);
+    const assetId = dragAssetId.current;
+    if (assetId && onMoveToFolder) {
+      onMoveToFolder(assetId, null);
+    }
+    dragAssetId.current = null;
+  };
+
+  const handleDragLeave = () => {
+    setDragOverFolder(undefined);
   };
 
   return (
@@ -110,13 +153,19 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
           <div className="grid grid-cols-2 gap-2 mb-2">
             {folders.map(folder => {
               const count = assets.filter(a => a.folder === folder).length;
+              const isDragOver = dragOverFolder === folder;
               return (
                 <button
                   key={folder}
                   onClick={() => setCurrentFolder(folder)}
-                  className="flex items-center gap-2 p-3 rounded-lg bg-surface card-hover btn-press text-left"
+                  onDragOver={(e) => handleFolderDragOver(e, folder)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleFolderDrop(e, folder)}
+                  className={`flex items-center gap-2 p-3 rounded-lg bg-surface card-hover btn-press text-left transition-all ${
+                    isDragOver ? 'ring-2 ring-primary bg-primary/10 scale-105' : ''
+                  }`}
                 >
-                  <Folder className="w-5 h-5 text-primary shrink-0" />
+                  <Folder className={`w-5 h-5 shrink-0 transition-colors ${isDragOver ? 'text-primary' : 'text-primary'}`} />
                   <div className="min-w-0">
                     <p className="font-display text-xs font-semibold truncate">{folder}</p>
                     <p className="text-[10px] text-muted-foreground">{count} asset{count !== 1 ? 's' : ''}</p>
@@ -124,6 +173,20 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {/* Drop zone to move back to root when inside a folder */}
+        {currentFolder && onMoveToFolder && (
+          <div
+            onDragOver={handleRootDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleRootDrop}
+            className={`mb-2 p-2.5 rounded-lg border-2 border-dashed text-center text-xs text-muted-foreground transition-all ${
+              dragOverFolder === null ? 'border-primary bg-primary/10 text-primary' : 'border-border/30'
+            }`}
+          >
+            Drop here to move to root
           </div>
         )}
 
@@ -145,11 +208,13 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
               return (
                 <div
                   key={asset.id}
+                  draggable={!!onMoveToFolder}
+                  onDragStart={(e) => handleDragStart(e, asset.id)}
                   onClick={() => !isConfirmingDelete && setPreviewAsset(asset)}
                   className="group relative aspect-video rounded-lg bg-surface overflow-hidden card-hover cursor-pointer"
                 >
                   {asset.imageUrl ? (
-                    <img src={asset.imageUrl} alt={asset.title} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={asset.imageUrl} alt={asset.title} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-surface-hover to-surface flex items-center justify-center">
                       <Icon className="w-8 h-8 text-muted-foreground/30" />

@@ -1,0 +1,1 @@
+ALTER TABLE public.session_assets REPLICA IDENTITY FULL;
