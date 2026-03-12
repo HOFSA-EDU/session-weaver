@@ -10,6 +10,7 @@ interface AssetLibraryProps {
   onUpdateType?: (assetId: string, type: Asset['type']) => void;
   onDeleteAsset?: (assetId: string) => void;
   onMoveToFolder?: (assetId: string, folder: string | null) => void;
+  onUpdateDescription?: (assetId: string, description: string) => void;
 }
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -35,7 +36,7 @@ const DEFAULT_FOLDERS = [
   { name: 'Clues', type: 'clue' as const },
 ];
 
-export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDeleteAsset, onMoveToFolder }: AssetLibraryProps) {
+export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDeleteAsset, onMoveToFolder, onUpdateDescription }: AssetLibraryProps) {
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -197,6 +198,10 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
         onClose={() => setPreviewAsset(null)}
         onUpdateType={onUpdateType ? handleUpdateType : undefined}
         onDeleteAsset={onDeleteAsset ? handleDeleteAsset : undefined}
+        onUpdateDescription={onUpdateDescription ? (assetId, desc) => {
+          onUpdateDescription(assetId, desc);
+          if (previewAsset?.id === assetId) setPreviewAsset({ ...previewAsset!, description: desc });
+        } : undefined}
       />
     </>
   );

@@ -191,6 +191,9 @@ export default function DMDashboard() {
     onDeleteAsset: (assetId: string) => {
       deleteAsset.mutate({ id: assetId, sessionId: sessionId! });
     },
+    onUpdateDescription: (assetId: string, description: string) => {
+      updateAsset.mutate({ id: assetId, sessionId: sessionId!, description });
+    },
   };
 
   const noteProps = {
