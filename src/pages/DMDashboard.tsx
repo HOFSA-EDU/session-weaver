@@ -105,16 +105,21 @@ export default function DMDashboard() {
     e.target.value = '';
   };
 
-  const handleSendAsset = async (assetId: string) => {
-    // Send to all party
-    await createAsset.mutateAsync ? undefined : undefined;
-    const asset = assets.find(a => a.id === assetId);
-    if (!asset) return;
-    // For now, share with all
-    const { error } = await (await import("@/integrations/supabase/client")).supabase
-      .from("session_assets").update({ shared_with: ['all'] }).eq("id", assetId);
-    if (!error) toast.success("Sent to party");
+  const handleSendAsset = (assetId: string) => {
+    setShareAssetId(assetId);
   };
+
+  const handleShareConfirm = async (targetIds: string[]) => {
+    if (!shareAssetId) return;
+    const { error } = await (await import("@/integrations/supabase/client")).supabase
+      .from("session_assets").update({ shared_with: targetIds }).eq("id", shareAssetId);
+    if (!error) {
+      toast.success(targetIds.includes('all') ? "Sent to party" : `Sent to ${targetIds.length} player${targetIds.length !== 1 ? 's' : ''}`);
+    }
+    setShareAssetId(null);
+  };
+
+  const shareAsset = assets.find(a => a.id === shareAssetId);
 
   const handleAddNote = async (content: string, type: 'personal' | 'session') => {
     await createNote.mutateAsync({
