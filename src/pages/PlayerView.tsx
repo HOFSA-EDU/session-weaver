@@ -5,7 +5,7 @@ import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { ReceivedAssets } from "@/components/ReceivedAssets";
 import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
-import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
+import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useUpdateNote, useDeleteNote, useSessionRealtime } from "@/hooks/use-session-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useTurnSound } from "@/hooks/use-turn-sound";
 import { useStatusEffectSound } from "@/hooks/use-status-effect-sound";
@@ -22,6 +22,8 @@ export default function PlayerView() {
   const currentPlayer = players.find(p => p.user_id === user?.id);
   const { data: notes = [] } = useSessionNotes(sessionId || null, currentPlayer?.id);
   const createNote = useCreateNote();
+  const updateNote = useUpdateNote();
+  const deleteNote = useDeleteNote();
   useSessionRealtime(sessionId || null);
 
   // Redirect player if kicked by DM
@@ -122,6 +124,12 @@ export default function PlayerView() {
           }))}
           currentUserId={currentPlayer?.id || ''}
           onAddNote={handleAddNote}
+          onEditNote={(noteId, content) => {
+            if (sessionId) updateNote.mutate({ id: noteId, sessionId, content });
+          }}
+          onDeleteNote={(noteId) => {
+            if (sessionId) deleteNote.mutate({ id: noteId, sessionId });
+          }}
         />
       </div>
     </div>

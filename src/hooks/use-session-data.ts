@@ -256,6 +256,30 @@ export function useCreateNote() {
   });
 }
 
+export function useUpdateNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, sessionId, content }: { id: string; sessionId: string; content: string }) => {
+      const { data, error } = await supabase.from("session_notes").update({ content }).eq("id", id).select().single();
+      if (error) throw error;
+      return { ...data, sessionId };
+    },
+    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["session-notes", data.sessionId] }),
+  });
+}
+
+export function useDeleteNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, sessionId }: { id: string; sessionId: string }) => {
+      const { error } = await supabase.from("session_notes").delete().eq("id", id);
+      if (error) throw error;
+      return { sessionId };
+    },
+    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["session-notes", data.sessionId] }),
+  });
+}
+
 // ===== REALTIME SUBSCRIPTIONS =====
 
 export function useSessionRealtime(sessionId: string | null) {

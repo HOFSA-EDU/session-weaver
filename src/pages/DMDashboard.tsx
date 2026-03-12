@@ -9,7 +9,7 @@ import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
-  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote,
+  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote, useUpdateNote, useDeleteNote,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -42,6 +42,8 @@ export default function DMDashboard() {
   const updateAsset = useUpdateAsset();
   const deleteAsset = useDeleteAsset();
   const createNote = useCreateNote();
+  const updateNote = useUpdateNote();
+  const deleteNote = useDeleteNote();
 
   if (sessionLoading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading session...</p></div>;
@@ -215,7 +217,14 @@ export default function DMDashboard() {
       updatedAt: n.updated_at,
     })),
     currentUserId: dmAuthorId,
+    isDM: true,
     onAddNote: handleAddNote,
+    onEditNote: (noteId: string, content: string) => {
+      updateNote.mutate({ id: noteId, sessionId: session.id, content });
+    },
+    onDeleteNote: (noteId: string) => {
+      deleteNote.mutate({ id: noteId, sessionId: session.id });
+    },
   };
 
   const tabs: { id: MobileTab; icon: React.ElementType; label: string }[] = [
