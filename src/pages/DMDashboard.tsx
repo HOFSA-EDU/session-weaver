@@ -183,6 +183,9 @@ export default function DMDashboard() {
     })),
     onUpload: handleUpload,
     onSendAsset: handleSendAsset,
+    onUpdateType: (assetId: string, type: string) => {
+      updateAsset.mutate({ id: assetId, sessionId: sessionId!, asset_type: type });
+    },
   };
 
   const noteProps = {
