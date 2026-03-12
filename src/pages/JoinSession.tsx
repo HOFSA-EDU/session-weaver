@@ -98,7 +98,7 @@ export default function JoinSession() {
 
           <button
             onClick={handleJoin}
-            disabled={!session || (!existingPlayer && !playerName.trim()) || joinSession.isPending}
+            disabled={!session || isInactive || (!existingPlayer && !playerName.trim()) || joinSession.isPending}
             className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-medium btn-press transition-all hover:brightness-110 disabled:opacity-30 disabled:pointer-events-none mt-4"
           >
             <LogIn className="w-5 h-5" />
