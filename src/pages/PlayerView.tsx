@@ -8,6 +8,7 @@ import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useTurnSound } from "@/hooks/use-turn-sound";
+import { useStatusEffectSound } from "@/hooks/use-status-effect-sound";
 import { ArrowLeft } from "lucide-react";
 
 export default function PlayerView() {
@@ -35,6 +36,7 @@ export default function PlayerView() {
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
   const { soundEnabled, toggleSound } = useTurnSound(isMyTurn);
+  useStatusEffectSound(currentPlayer?.status_effects || []);
 
   const myAssets = assets.filter(
     a => a.shared_with.includes('all') || (currentPlayer && a.shared_with.includes(currentPlayer.id))
