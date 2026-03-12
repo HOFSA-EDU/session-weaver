@@ -5,6 +5,7 @@ import { Player, STATUS_EFFECTS } from "@/lib/mock-data";
 interface InitiativeTrackerProps {
   players: Player[];
   onNextTurn?: () => void;
+  onClearFocus?: () => void;
   onMovePlayer?: (playerId: string, direction: 'up' | 'down') => void;
   isCompact?: boolean;
 }

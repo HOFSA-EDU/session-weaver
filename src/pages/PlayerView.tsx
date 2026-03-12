@@ -8,6 +8,7 @@ import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useTurnSound } from "@/hooks/use-turn-sound";
+import { useStatusEffectSound } from "@/hooks/use-status-effect-sound";
 import { ArrowLeft } from "lucide-react";
 
 export default function PlayerView() {
