@@ -124,6 +124,12 @@ export default function PlayerView() {
           }))}
           currentUserId={currentPlayer?.id || ''}
           onAddNote={handleAddNote}
+          onEditNote={(noteId, content) => {
+            if (sessionId) updateNote.mutate({ id: noteId, sessionId, content });
+          }}
+          onDeleteNote={(noteId) => {
+            if (sessionId) deleteNote.mutate({ id: noteId, sessionId });
+          }}
         />
       </div>
     </div>
