@@ -45,6 +45,8 @@ export default function DMDashboard() {
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
   const deleteNote = useDeleteNote();
+  const updateSession = useUpdateSession();
+  const deleteSession = useDeleteSession();
 
   if (sessionLoading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading session...</p></div>;
