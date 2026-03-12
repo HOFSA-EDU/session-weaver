@@ -13,7 +13,7 @@ import {
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getDeviceId } from "@/lib/session-utils";
+import { useAuth } from "@/hooks/use-auth";
 import { Users, Swords, BookOpen, Image, Shield } from "lucide-react";
 import { toast } from "sonner";
 
