@@ -92,7 +92,7 @@ export function useSessionPlayers(sessionId: string | null) {
     queryKey: ["session-players", sessionId],
     queryFn: async () => {
       if (!sessionId) return [];
-      const { data, error } = await supabase.from("session_players").select("*").eq("session_id", sessionId).order("initiative", { ascending: false, nullsFirst: false });
+      const { data, error } = await supabase.from("session_players").select("*").eq("session_id", sessionId).order("turn_order", { ascending: true });
       if (error) throw error;
       return data as SessionPlayer[];
     },
@@ -105,9 +105,12 @@ export function useJoinSession() {
   return useMutation({
     mutationFn: async ({ sessionId, playerName }: { sessionId: string; playerName: string }) => {
       const token = crypto.randomUUID();
+      // Get max turn_order to append at end
+      const { data: existing } = await supabase.from("session_players").select("turn_order").eq("session_id", sessionId).order("turn_order", { ascending: false }).limit(1);
+      const nextOrder = (existing && existing.length > 0 ? existing[0].turn_order : -1) + 1;
       const { data, error } = await supabase
         .from("session_players")
-        .insert({ session_id: sessionId, player_name: playerName, player_token: token })
+        .insert({ session_id: sessionId, player_name: playerName, player_token: token, turn_order: nextOrder })
         .select()
         .single();
       if (error) throw error;

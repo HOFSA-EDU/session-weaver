@@ -106,6 +106,7 @@ export type Database = {
           player_token: string
           session_id: string
           status_effects: string[]
+          turn_order: number
         }
         Insert: {
           created_at?: string
@@ -116,6 +117,7 @@ export type Database = {
           player_token: string
           session_id: string
           status_effects?: string[]
+          turn_order?: number
         }
         Update: {
           created_at?: string
@@ -126,6 +128,7 @@ export type Database = {
           player_token?: string
           session_id?: string
           status_effects?: string[]
+          turn_order?: number
         }
         Relationships: [
           {

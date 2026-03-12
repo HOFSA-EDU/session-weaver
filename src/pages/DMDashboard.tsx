@@ -68,6 +68,19 @@ export default function DMDashboard() {
     }
   };
 
+  const handleMovePlayer = async (playerId: string, direction: 'up' | 'down') => {
+    const index = players.findIndex(p => p.id === playerId);
+    if (index === -1) return;
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= players.length) return;
+    const playerA = players[index];
+    const playerB = players[swapIndex];
+    await Promise.all([
+      updatePlayer.mutateAsync({ id: playerA.id, sessionId: session.id, turn_order: playerB.turn_order }),
+      updatePlayer.mutateAsync({ id: playerB.id, sessionId: session.id, turn_order: playerA.turn_order }),
+    ]);
+  };
+
   const handleRemovePlayer = async (id: string) => {
     await removePlayer.mutateAsync({ id, sessionId: session.id });
   };
@@ -140,6 +153,7 @@ export default function DMDashboard() {
       isActive: p.is_active,
     })),
     onNextTurn: handleNextTurn,
+    onMovePlayer: handleMovePlayer,
   };
 
   const playerListProps = {
