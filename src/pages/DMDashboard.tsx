@@ -25,6 +25,7 @@ export default function DMDashboard() {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>('initiative');
   const [selectedPlayerEffects, setSelectedPlayerEffects] = useState<string | null>(null);
+  const [shareAssetId, setShareAssetId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: session, isLoading: sessionLoading } = useSession(sessionId || null);
