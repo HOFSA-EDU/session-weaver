@@ -40,6 +40,7 @@ export default function DMDashboard() {
   const removePlayer = useRemovePlayer();
   const createAsset = useCreateAsset();
   const updateAsset = useUpdateAsset();
+  const deleteAsset = useDeleteAsset();
   const createNote = useCreateNote();
 
   if (sessionLoading) {
