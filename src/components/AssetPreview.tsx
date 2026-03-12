@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { Asset } from "@/lib/mock-data";
-import { X, ExternalLink, Tag, Trash2 } from "lucide-react";
+import { X, ExternalLink, Tag, Trash2, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ASSET_TYPES: { value: Asset['type']; label: string }[] = [
@@ -23,16 +24,35 @@ interface AssetPreviewProps {
   onClose: () => void;
   onUpdateType?: (assetId: string, type: Asset['type']) => void;
   onDeleteAsset?: (assetId: string) => void;
+  onUpdateDescription?: (assetId: string, description: string) => void;
 }
 
-export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset }: AssetPreviewProps) {
+export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, onUpdateDescription }: AssetPreviewProps) {
+  const [editingDesc, setEditingDesc] = useState(false);
+  const [descDraft, setDescDraft] = useState("");
+
+  // Sync draft when asset changes
+  useEffect(() => {
+    if (asset) {
+      setDescDraft(asset.description || "");
+      setEditingDesc(false);
+    }
+  }, [asset?.id, asset?.description]);
+
   if (!asset) return null;
 
   const openInNewTab = () => {
-    if (asset.imageUrl) {
-      window.open(asset.imageUrl, '_blank');
-    }
+    if (asset.imageUrl) window.open(asset.imageUrl, '_blank');
   };
+
+  const handleSaveDesc = () => {
+    if (onUpdateDescription && descDraft !== (asset.description || "")) {
+      onUpdateDescription(asset.id, descDraft);
+    }
+    setEditingDesc(false);
+  };
+
+  const isDM = !!onUpdateDescription;
 
   return (
     <AnimatePresence>
@@ -54,12 +74,10 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset }: As
             className="relative max-w-4xl w-full max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header */}
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h2 className="font-display text-xl font-bold">{asset.title}</h2>
-                {asset.description && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{asset.description}</p>
-                )}
               </div>
               <div className="flex gap-2">
                 {onDeleteAsset && (
@@ -86,6 +104,7 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset }: As
               </div>
             </div>
 
+            {/* Type Labels (DM only) */}
             {onUpdateType && (
               <div className="flex items-center gap-2 mb-3">
                 <Tag className="w-4 h-4 text-muted-foreground" />
@@ -107,12 +126,59 @@ export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset }: As
               </div>
             )}
 
+            {/* Information field */}
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Information</span>
+              </div>
+              {isDM && editingDesc ? (
+                <div className="space-y-2">
+                  <textarea
+                    autoFocus
+                    value={descDraft}
+                    onChange={e => setDescDraft(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Escape') setEditingDesc(false); }}
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-lg bg-surface text-sm text-foreground border border-border/30 focus:outline-none focus:border-primary/50 resize-none"
+                    placeholder="Add information about this asset..."
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={handleSaveDesc} className="px-3 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-medium btn-press">
+                      Save
+                    </button>
+                    <button onClick={() => { setEditingDesc(false); setDescDraft(asset.description || ""); }} className="px-3 py-1 rounded-lg bg-surface text-muted-foreground text-xs btn-press">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : isDM ? (
+                <div
+                  onClick={() => setEditingDesc(true)}
+                  className="px-3 py-2 rounded-lg bg-surface text-sm cursor-pointer card-hover min-h-[2.5rem]"
+                >
+                  {asset.description ? (
+                    <p className="text-foreground whitespace-pre-wrap">{asset.description}</p>
+                  ) : (
+                    <p className="text-muted-foreground italic">Click to add information...</p>
+                  )}
+                </div>
+              ) : asset.description ? (
+                <div className="px-3 py-2 rounded-lg bg-surface text-sm">
+                  <p className="text-foreground whitespace-pre-wrap">{asset.description}</p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm italic px-3">No information provided.</p>
+              )}
+            </div>
+
+            {/* Image */}
             {asset.imageUrl ? (
               <div className="flex-1 min-h-0 rounded-2xl overflow-hidden bg-surface">
                 <img
                   src={asset.imageUrl}
                   alt={asset.title}
-                  className="w-full h-full object-contain max-h-[75vh] cursor-zoom-in"
+                  className="w-full h-full object-contain max-h-[65vh] cursor-zoom-in"
                   onClick={openInNewTab}
                 />
               </div>
