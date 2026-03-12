@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, TablesInsert } from "@/integrations/supabase/types";
-import { generateJoinCode, getDeviceId, setDMSession, setPlayerToken, getAllPlayerSessions } from "@/lib/session-utils";
+import { generateJoinCode } from "@/lib/session-utils";
 import { useEffect } from "react";
 
 type Session = Tables<"sessions">;
@@ -15,18 +15,18 @@ export function useCreateSession() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ name, description }: { name: string; description: string }) => {
-      const creatorId = getDeviceId();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
       const joinCode = generateJoinCode();
       const { data, error } = await supabase
         .from("sessions")
-        .insert({ name, description, join_code: joinCode, creator_id: creatorId })
+        .insert({ name, description, join_code: joinCode, creator_id: user.id, user_id: user.id })
         .select()
         .single();
       if (error) throw error;
-      setDMSession(data.id);
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dm-sessions"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-sessions"] }),
   });
 }
 
@@ -56,36 +56,34 @@ export function useSessionByCode(code: string | null) {
   });
 }
 
-export function useDMSessions() {
-  const dmSessions = (() => {
-    try { return JSON.parse(localStorage.getItem('arcane-table-dm-sessions') || '[]'); }
-    catch { return []; }
-  })();
-  
+export function useMySessions() {
   return useQuery({
-    queryKey: ["dm-sessions", dmSessions],
+    queryKey: ["my-sessions"],
     queryFn: async () => {
-      if (dmSessions.length === 0) return [];
-      const { data, error } = await supabase.from("sessions").select("*").in("id", dmSessions).order("created_at", { ascending: false });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data, error } = await supabase.from("sessions").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data as Session[];
     },
   });
 }
 
-export function usePlayerSessions() {
-  const playerSessions = getAllPlayerSessions();
-  const sessionIds = playerSessions.map(p => p.sessionId);
-
+export function useMyPlayerSessions() {
   return useQuery({
-    queryKey: ["player-sessions", sessionIds],
+    queryKey: ["my-player-sessions"],
     queryFn: async () => {
-      if (sessionIds.length === 0) return [];
-      const { data, error } = await supabase.from("sessions").select("*").in("id", sessionIds).order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data as Session[]).map(s => ({
-        ...s,
-        playerInfo: playerSessions.find(p => p.sessionId === s.id)!,
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data: playerEntries, error: pErr } = await supabase
+        .from("session_players")
+        .select("*, sessions(*)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (pErr) throw pErr;
+      return (playerEntries || []).map((p: any) => ({
+        session: p.sessions as Session,
+        player: p as SessionPlayer,
       }));
     },
   });
@@ -122,20 +120,35 @@ export function useJoinSession() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ sessionId, playerName }: { sessionId: string; playerName: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      
+      // Check if already joined
+      const { data: existing } = await supabase
+        .from("session_players")
+        .select("*")
+        .eq("session_id", sessionId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (existing) return existing as SessionPlayer;
+
+      // Get max turn_order
+      const { data: lastPlayer } = await supabase.from("session_players").select("turn_order").eq("session_id", sessionId).order("turn_order", { ascending: false }).limit(1);
+      const nextOrder = (lastPlayer && lastPlayer.length > 0 ? lastPlayer[0].turn_order : -1) + 1;
+      
       const token = crypto.randomUUID();
-      // Get max turn_order to append at end
-      const { data: existing } = await supabase.from("session_players").select("turn_order").eq("session_id", sessionId).order("turn_order", { ascending: false }).limit(1);
-      const nextOrder = (existing && existing.length > 0 ? existing[0].turn_order : -1) + 1;
       const { data, error } = await supabase
         .from("session_players")
-        .insert({ session_id: sessionId, player_name: playerName, player_token: token, turn_order: nextOrder })
+        .insert({ session_id: sessionId, player_name: playerName, player_token: token, turn_order: nextOrder, user_id: user.id })
         .select()
         .single();
       if (error) throw error;
-      setPlayerToken(sessionId, data.id, token);
       return data;
     },
-    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["session-players", data.session_id] }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["session-players", data.session_id] });
+      queryClient.invalidateQueries({ queryKey: ["my-player-sessions"] });
+    },
   });
 }
 
@@ -209,10 +222,8 @@ export function useSessionNotes(sessionId: string | null, authorId?: string) {
     queryKey: ["session-notes", sessionId, authorId],
     queryFn: async () => {
       if (!sessionId) return [];
-      let query = supabase.from("session_notes").select("*").eq("session_id", sessionId).order("created_at", { ascending: false });
-      const { data, error } = await query;
+      const { data, error } = await supabase.from("session_notes").select("*").eq("session_id", sessionId).order("created_at", { ascending: false });
       if (error) throw error;
-      // Filter: show session notes + personal notes for this author
       return (data as SessionNote[]).filter(
         n => n.note_type === 'session' || n.author_id === authorId
       );
