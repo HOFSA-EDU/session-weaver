@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ShareAssetDialog } from "@/components/ShareAssetDialog";
 import { SessionHeader } from "@/components/SessionHeader";
 import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { PlayerList } from "@/components/PlayerList";
@@ -24,6 +25,7 @@ export default function DMDashboard() {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>('initiative');
   const [selectedPlayerEffects, setSelectedPlayerEffects] = useState<string | null>(null);
+  const [shareAssetId, setShareAssetId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: session, isLoading: sessionLoading } = useSession(sessionId || null);
@@ -103,16 +105,21 @@ export default function DMDashboard() {
     e.target.value = '';
   };
 
-  const handleSendAsset = async (assetId: string) => {
-    // Send to all party
-    await createAsset.mutateAsync ? undefined : undefined;
-    const asset = assets.find(a => a.id === assetId);
-    if (!asset) return;
-    // For now, share with all
-    const { error } = await (await import("@/integrations/supabase/client")).supabase
-      .from("session_assets").update({ shared_with: ['all'] }).eq("id", assetId);
-    if (!error) toast.success("Sent to party");
+  const handleSendAsset = (assetId: string) => {
+    setShareAssetId(assetId);
   };
+
+  const handleShareConfirm = async (targetIds: string[]) => {
+    if (!shareAssetId) return;
+    const { error } = await (await import("@/integrations/supabase/client")).supabase
+      .from("session_assets").update({ shared_with: targetIds }).eq("id", shareAssetId);
+    if (!error) {
+      toast.success(targetIds.includes('all') ? "Sent to party" : `Sent to ${targetIds.length} player${targetIds.length !== 1 ? 's' : ''}`);
+    }
+    setShareAssetId(null);
+  };
+
+  const shareAsset = assets.find(a => a.id === shareAssetId);
 
   const handleAddNote = async (content: string, type: 'personal' | 'session') => {
     await createNote.mutateAsync({
@@ -221,6 +228,14 @@ export default function DMDashboard() {
             </button>
           ))}
         </div>
+        {shareAsset && (
+          <ShareAssetDialog
+            assetTitle={shareAsset.title}
+            players={players.map(p => ({ id: p.id, name: p.player_name }))}
+            onShare={handleShareConfirm}
+            onClose={() => setShareAssetId(null)}
+          />
+        )}
       </div>
     );
   }
@@ -248,6 +263,14 @@ export default function DMDashboard() {
           <NotesPanel {...noteProps} />
         </div>
       </div>
+      {shareAsset && (
+        <ShareAssetDialog
+          assetTitle={shareAsset.title}
+          players={players.map(p => ({ id: p.id, name: p.player_name }))}
+          onShare={handleShareConfirm}
+          onClose={() => setShareAssetId(null)}
+        />
+      )}
     </div>
   );
 }
