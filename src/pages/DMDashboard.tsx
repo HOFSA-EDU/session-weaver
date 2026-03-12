@@ -10,6 +10,7 @@ import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
   useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote, useUpdateNote, useDeleteNote,
+  useUpdateSession, useDeleteSession,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
