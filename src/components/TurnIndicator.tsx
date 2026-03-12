@@ -1,8 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeOff } from "lucide-react";
 
 interface TurnIndicatorProps {
   isYourTurn: boolean;
   currentPlayerName: string;
+  soundEnabled?: boolean;
+  onToggleSound?: () => void;
 }
 
 export function TurnIndicator({ isYourTurn, currentPlayerName }: TurnIndicatorProps) {

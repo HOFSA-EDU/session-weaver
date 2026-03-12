@@ -5,6 +5,7 @@ import { ReceivedAssets } from "@/components/ReceivedAssets";
 import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
+import { useTurnSound } from "@/hooks/use-turn-sound";
 import { getPlayerSession } from "@/lib/session-utils";
 import { ArrowLeft } from "lucide-react";
 
