@@ -72,6 +72,13 @@ export default function DMDashboard() {
     }
   };
 
+  const handleClearFocus = async () => {
+    const activePlayers = players.filter(p => p.is_active);
+    for (const p of activePlayers) {
+      await updatePlayer.mutateAsync({ id: p.id, sessionId: session.id, is_active: false });
+    }
+  };
+
   const handleMovePlayer = async (playerId: string, direction: 'up' | 'down') => {
     const index = players.findIndex(p => p.id === playerId);
     if (index === -1) return;
