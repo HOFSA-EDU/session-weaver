@@ -153,6 +153,7 @@ export default function DMDashboard() {
       isActive: p.is_active,
     })),
     onNextTurn: handleNextTurn,
+    onMovePlayer: handleMovePlayer,
   };
 
   const playerListProps = {
