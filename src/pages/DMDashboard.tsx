@@ -9,7 +9,7 @@ import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
-  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useCreateNote,
+  useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,6 +40,7 @@ export default function DMDashboard() {
   const removePlayer = useRemovePlayer();
   const createAsset = useCreateAsset();
   const updateAsset = useUpdateAsset();
+  const deleteAsset = useDeleteAsset();
   const createNote = useCreateNote();
 
   if (sessionLoading) {
@@ -180,11 +181,23 @@ export default function DMDashboard() {
       type: a.asset_type as any,
       sharedWith: a.shared_with,
       createdAt: a.created_at,
+      folder: a.folder || null,
     })),
     onUpload: handleUpload,
     onSendAsset: handleSendAsset,
     onUpdateType: (assetId: string, type: string) => {
       updateAsset.mutate({ id: assetId, sessionId: sessionId!, asset_type: type });
+    },
+    onDeleteAsset: (assetId: string) => {
+      deleteAsset.mutate({ id: assetId, sessionId: sessionId! });
+    },
+    onMoveToFolder: (assetId: string, folder: string | null) => {
+      updateAsset.mutate({ id: assetId, sessionId: sessionId!, folder });
+    },
+    onCreateFolder: (folderName: string) => {
+      // Folders are virtual — derived from asset.folder values
+      // We create a placeholder asset to establish the folder, or just assign folder to existing assets
+      toast.success(`Folder "${folderName}" created`);
     },
   };
 

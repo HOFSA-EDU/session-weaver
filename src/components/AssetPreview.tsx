@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Asset } from "@/lib/mock-data";
-import { X, ExternalLink, Tag } from "lucide-react";
+import { X, ExternalLink, Tag, Trash2, FolderInput } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ASSET_TYPES: { value: Asset['type']; label: string }[] = [
@@ -23,9 +22,13 @@ interface AssetPreviewProps {
   asset: Asset | null;
   onClose: () => void;
   onUpdateType?: (assetId: string, type: Asset['type']) => void;
+  onDeleteAsset?: (assetId: string) => void;
+  folders?: string[];
+  currentFolder?: string | null;
+  onMoveToFolder?: (assetId: string, folder: string | null) => void;
 }
 
-export function AssetPreview({ asset, onClose, onUpdateType }: AssetPreviewProps) {
+export function AssetPreview({ asset, onClose, onUpdateType, onDeleteAsset, folders = [], currentFolder, onMoveToFolder }: AssetPreviewProps) {
   if (!asset) return null;
 
   const openInNewTab = () => {
@@ -63,6 +66,15 @@ export function AssetPreview({ asset, onClose, onUpdateType }: AssetPreviewProps
                 )}
               </div>
               <div className="flex gap-2">
+                {onDeleteAsset && (
+                  <button
+                    onClick={() => onDeleteAsset(asset.id)}
+                    className="p-2 rounded-lg bg-destructive/20 hover:bg-destructive/40 transition-colors btn-press"
+                    title="Delete asset"
+                  >
+                    <Trash2 className="w-5 h-5 text-destructive" />
+                  </button>
+                )}
                 {asset.imageUrl && (
                   <button
                     onClick={openInNewTab}
@@ -94,6 +106,38 @@ export function AssetPreview({ asset, onClose, onUpdateType }: AssetPreviewProps
                       }`}
                     >
                       {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Move to folder */}
+            {onMoveToFolder && folders.length > 0 && (
+              <div className="flex items-center gap-2 mb-3">
+                <FolderInput className="w-4 h-4 text-muted-foreground" />
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => onMoveToFolder(asset.id, null)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-all btn-press ${
+                      !asset.folder
+                        ? 'bg-primary/20 text-primary border-primary/30'
+                        : 'bg-surface border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Root
+                  </button>
+                  {folders.map(f => (
+                    <button
+                      key={f}
+                      onClick={() => onMoveToFolder(asset.id, f)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-all btn-press ${
+                        asset.folder === f
+                          ? 'bg-primary/20 text-primary border-primary/30'
+                          : 'bg-surface border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {f}
                     </button>
                   ))}
                 </div>
