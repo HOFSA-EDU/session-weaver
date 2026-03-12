@@ -48,7 +48,7 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType }: As
           <div className="grid grid-cols-2 gap-2">
             {assets.map(asset => {
               const Icon = typeIcons[asset.type] || Eye;
-              const shared = asset.sharedWith.length > 0;
+              const sharedCount = asset.sharedWith.includes('all') ? 'All' : asset.sharedWith.length;
               return (
                 <div
                   key={asset.id}
@@ -68,11 +68,11 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType }: As
                       <span className={`h-5 px-1.5 rounded-full text-[10px] font-medium inline-flex items-center ${typeColors[asset.type] || typeColors.handout}`}>
                         {asset.type}
                       </span>
-                      {shared && (
-                        <span className="h-5 px-1.5 rounded-full bg-primary/20 text-primary text-[10px] font-medium inline-flex items-center gap-0.5">
-                          {asset.sharedWith.includes('all') ? <><Users className="w-2.5 h-2.5" /> All</> : <><User className="w-2.5 h-2.5" /> {asset.sharedWith.length}</>}
-                        </span>
-                      )}
+                      <span className={`h-5 px-1.5 rounded-full text-[10px] font-medium inline-flex items-center gap-0.5 ${
+                        sharedCount === 0 ? 'bg-muted/20 text-muted-foreground' : 'bg-primary/20 text-primary'
+                      }`}>
+                        {sharedCount === 'All' ? <><Users className="w-2.5 h-2.5" /> All</> : <><User className="w-2.5 h-2.5" /> {sharedCount}</>}
+                      </span>
                     </div>
                     <h4 className="font-display text-xs font-semibold truncate">{asset.title}</h4>
                   </div>

@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 import { TurnIndicator } from "@/components/TurnIndicator";
 import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { ReceivedAssets } from "@/components/ReceivedAssets";
@@ -21,6 +22,15 @@ export default function PlayerView() {
   const { data: notes = [] } = useSessionNotes(sessionId || null, currentPlayer?.id);
   const createNote = useCreateNote();
   useSessionRealtime(sessionId || null);
+
+  // Redirect player if kicked by DM
+  useEffect(() => {
+    if (!user || players.length === 0) return;
+    const stillInSession = players.some(p => p.user_id === user.id);
+    if (!stillInSession && players.length > 0) {
+      navigate("/", { replace: true });
+    }
+  }, [players, user, navigate]);
 
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
