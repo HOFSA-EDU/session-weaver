@@ -63,6 +63,15 @@ export default function PlayerView() {
     );
   }
 
+  if (!session.is_active) {
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+        <p className="text-muted-foreground">This session is currently inactive.</p>
+        <button onClick={() => navigate("/")} className="px-4 py-2 rounded-lg bg-surface card-hover btn-press text-sm">Back to Home</button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex items-center gap-3 p-4">
