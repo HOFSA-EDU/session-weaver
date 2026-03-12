@@ -70,6 +70,7 @@ export const MOCK_ASSETS: Asset[] = [
     type: 'map',
     sharedWith: ['all'],
     createdAt: '2025-03-10T18:00:00Z',
+    folder: null,
   },
   {
     id: 'a2',
@@ -79,6 +80,7 @@ export const MOCK_ASSETS: Asset[] = [
     type: 'letter',
     sharedWith: ['p2'],
     createdAt: '2025-03-10T19:30:00Z',
+    folder: null,
   },
   {
     id: 'a3',
@@ -88,6 +90,7 @@ export const MOCK_ASSETS: Asset[] = [
     type: 'clue',
     sharedWith: ['p1', 'p3'],
     createdAt: '2025-03-10T20:00:00Z',
+    folder: null,
   },
 ];
 
