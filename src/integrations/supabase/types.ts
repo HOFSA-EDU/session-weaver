@@ -107,6 +107,7 @@ export type Database = {
           session_id: string
           status_effects: string[]
           turn_order: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -118,6 +119,7 @@ export type Database = {
           session_id: string
           status_effects?: string[]
           turn_order?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -129,6 +131,7 @@ export type Database = {
           session_id?: string
           status_effects?: string[]
           turn_order?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -151,6 +154,7 @@ export type Database = {
           is_active: boolean
           join_code: string
           name: string
+          user_id: string | null
         }
         Insert: {
           combat_started?: boolean
@@ -162,6 +166,7 @@ export type Database = {
           is_active?: boolean
           join_code: string
           name: string
+          user_id?: string | null
         }
         Update: {
           combat_started?: boolean
@@ -173,6 +178,7 @@ export type Database = {
           is_active?: boolean
           join_code?: string
           name?: string
+          user_id?: string | null
         }
         Relationships: []
       }
