@@ -11,9 +11,12 @@ interface NotesPanelProps {
 export function NotesPanel({ notes, currentUserId, onAddNote }: NotesPanelProps) {
   const [newNote, setNewNote] = useState("");
   const [noteType, setNoteType] = useState<'personal' | 'session'>('session');
+  const [filter, setFilter] = useState<'all' | 'session' | 'personal'>('all');
 
   const visibleNotes = notes.filter(
     n => n.type === 'session' || n.authorId === currentUserId
+  ).filter(
+    n => filter === 'all' || n.type === filter
   );
 
   const handleSubmit = () => {
@@ -25,7 +28,24 @@ export function NotesPanel({ notes, currentUserId, onAddNote }: NotesPanelProps)
 
   return (
     <div className="card-surface p-4">
-      <h3 className="font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Notes</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider">Notes</h3>
+        <div className="flex gap-1">
+          {(['all', 'session', 'personal'] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium transition-colors ${
+                filter === f ? 'bg-primary/20 text-primary' : 'bg-surface text-muted-foreground'
+              }`}
+            >
+              {f === 'all' && 'All'}
+              {f === 'session' && <><Globe className="w-2.5 h-2.5" /> Session</>}
+              {f === 'personal' && <><Lock className="w-2.5 h-2.5" /> Personal</>}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Add note */}
       {onAddNote && (
