@@ -68,10 +68,13 @@ export default function JoinSession() {
               <p className="text-xs text-crimson mt-1.5">Session not found.</p>
             )}
             {session && (
-              <div className="mt-2 p-3 rounded-lg bg-primary/10">
-                <p className="text-sm font-medium text-primary">{session.name}</p>
+              <div className={`mt-2 p-3 rounded-lg ${isInactive ? 'bg-destructive/10' : 'bg-primary/10'}`}>
+                <p className={`text-sm font-medium ${isInactive ? 'text-destructive' : 'text-primary'}`}>{session.name}</p>
                 {session.description && <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>}
-                {existingPlayer && (
+                {isInactive && (
+                  <p className="text-xs text-destructive/80 mt-1.5 font-medium">✕ This session is inactive — you cannot join.</p>
+                )}
+                {!isInactive && existingPlayer && (
                   <p className="text-xs text-primary/80 mt-1.5 font-medium">✦ You're already in this session — tap below to rejoin</p>
                 )}
               </div>
