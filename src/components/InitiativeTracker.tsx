@@ -10,7 +10,7 @@ interface InitiativeTrackerProps {
   isCompact?: boolean;
 }
 
-export function InitiativeTracker({ players, onNextTurn, onMovePlayer, isCompact = false }: InitiativeTrackerProps) {
+export function InitiativeTracker({ players, onNextTurn, onClearFocus, onMovePlayer, isCompact = false }: InitiativeTrackerProps) {
   if (players.length === 0) {
     return (
       <div className="card-surface p-6 text-center">
