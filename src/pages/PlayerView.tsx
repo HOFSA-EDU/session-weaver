@@ -86,7 +86,7 @@ export default function PlayerView() {
           players={players.map(p => ({
             id: p.id,
             name: p.player_name,
-            initiative: p.initiative,
+            initiative: null,
             statusEffects: p.status_effects,
             isActive: p.is_active,
           }))}
