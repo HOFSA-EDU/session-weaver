@@ -23,6 +23,15 @@ export default function PlayerView() {
   const createNote = useCreateNote();
   useSessionRealtime(sessionId || null);
 
+  // Redirect player if kicked by DM
+  useEffect(() => {
+    if (!user || players.length === 0) return;
+    const stillInSession = players.some(p => p.user_id === user.id);
+    if (!stillInSession && players.length > 0) {
+      navigate("/", { replace: true });
+    }
+  }, [players, user, navigate]);
+
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
   const { soundEnabled, toggleSound } = useTurnSound(isMyTurn);
