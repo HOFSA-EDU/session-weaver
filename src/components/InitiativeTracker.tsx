@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronUp, ChevronDown, SkipForward } from "lucide-react";
+import { ChevronRight, ChevronUp, ChevronDown, SkipForward, EyeOff } from "lucide-react";
 import { Player, STATUS_EFFECTS } from "@/lib/mock-data";
 
 interface InitiativeTrackerProps {
