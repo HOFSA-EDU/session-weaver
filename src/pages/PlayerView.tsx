@@ -65,6 +65,8 @@ export default function PlayerView() {
         <TurnIndicator
           isYourTurn={isMyTurn}
           currentPlayerName={activePlayer?.player_name || currentPlayer?.player_name || 'someone'}
+          soundEnabled={soundEnabled}
+          onToggleSound={toggleSound}
         />
 
         {currentPlayer && currentPlayer.status_effects.length > 0 && (
