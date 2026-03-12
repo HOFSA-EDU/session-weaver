@@ -16,7 +16,7 @@ export default function PlayerView() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { user } = useAuth();
 
-  const { data: session } = useSession(sessionId || null);
+  const { data: session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId || null);
   const { data: players = [] } = useSessionPlayers(sessionId || null);
   const { data: assets = [] } = useSessionAssets(sessionId || null);
   const currentPlayer = players.find(p => p.user_id === user?.id);
