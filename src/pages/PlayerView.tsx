@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 import { TurnIndicator } from "@/components/TurnIndicator";
 import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { ReceivedAssets } from "@/components/ReceivedAssets";
