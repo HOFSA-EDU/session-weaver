@@ -2,15 +2,25 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSessionByCode, useJoinSession } from "@/hooks/use-session-data";
 
 export default function JoinSession() {
   const navigate = useNavigate();
   const [joinCode, setJoinCode] = useState("");
   const [playerName, setPlayerName] = useState("");
+  const [error, setError] = useState("");
 
-  const handleJoin = () => {
-    if (joinCode.trim() && playerName.trim()) {
-      navigate(`/player?code=${joinCode.trim()}&name=${encodeURIComponent(playerName.trim())}`);
+  const { data: session, isLoading: lookingUp } = useSessionByCode(joinCode.length >= 4 ? joinCode : null);
+  const joinSession = useJoinSession();
+
+  const handleJoin = async () => {
+    if (!session || !playerName.trim()) return;
+    setError("");
+    try {
+      await joinSession.mutateAsync({ sessionId: session.id, playerName: playerName.trim() });
+      navigate(`/player/${session.id}`);
+    } catch (e: any) {
+      setError(e.message || "Failed to join session");
     }
   };
 
@@ -35,10 +45,19 @@ export default function JoinSession() {
               type="text"
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              placeholder="BLOOD42"
+              placeholder="ABC123"
               className="w-full bg-surface rounded-xl px-4 py-3.5 text-lg font-mono font-bold text-center tracking-widest text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring"
               maxLength={8}
             />
+            {joinCode.length >= 4 && !lookingUp && !session && (
+              <p className="text-xs text-crimson mt-1.5">Session not found.</p>
+            )}
+            {session && (
+              <div className="mt-2 p-3 rounded-lg bg-primary/10">
+                <p className="text-sm font-medium text-primary">{session.name}</p>
+                {session.description && <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>}
+              </div>
+            )}
           </div>
 
           <div>
@@ -52,13 +71,15 @@ export default function JoinSession() {
             />
           </div>
 
+          {error && <p className="text-xs text-crimson">{error}</p>}
+
           <button
             onClick={handleJoin}
-            disabled={!joinCode.trim() || !playerName.trim()}
+            disabled={!session || !playerName.trim() || joinSession.isPending}
             className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-medium btn-press transition-all hover:brightness-110 disabled:opacity-30 disabled:pointer-events-none mt-4"
           >
             <LogIn className="w-5 h-5" />
-            Enter the Fray
+            {joinSession.isPending ? 'Joining...' : 'Enter the Fray'}
           </button>
         </div>
       </motion.div>
