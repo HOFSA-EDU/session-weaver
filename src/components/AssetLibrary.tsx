@@ -25,7 +25,7 @@ const typeColors: Record<string, string> = {
   artefact: 'bg-rose-500/20 text-rose-400',
 };
 
-export function AssetLibrary({ assets, onUpload, onSendAsset }: AssetLibraryProps) {
+export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType }: AssetLibraryProps) {
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
 
   return (
