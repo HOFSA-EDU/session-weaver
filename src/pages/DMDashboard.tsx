@@ -164,6 +164,7 @@ export default function DMDashboard() {
       isActive: p.is_active,
     })),
     onNextTurn: handleNextTurn,
+    onClearFocus: handleClearFocus,
     onMovePlayer: handleMovePlayer,
   };
 
