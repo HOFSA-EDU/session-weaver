@@ -92,7 +92,7 @@ export function useSessionPlayers(sessionId: string | null) {
     queryKey: ["session-players", sessionId],
     queryFn: async () => {
       if (!sessionId) return [];
-      const { data, error } = await supabase.from("session_players").select("*").eq("session_id", sessionId).order("initiative", { ascending: false, nullsFirst: false });
+      const { data, error } = await supabase.from("session_players").select("*").eq("session_id", sessionId).order("turn_order", { ascending: true });
       if (error) throw error;
       return data as SessionPlayer[];
     },

@@ -1,14 +1,15 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, SkipForward } from "lucide-react";
+import { ChevronRight, ChevronUp, ChevronDown, SkipForward } from "lucide-react";
 import { Player, STATUS_EFFECTS } from "@/lib/mock-data";
 
 interface InitiativeTrackerProps {
   players: Player[];
   onNextTurn?: () => void;
+  onMovePlayer?: (playerId: string, direction: 'up' | 'down') => void;
   isCompact?: boolean;
 }
 
-export function InitiativeTracker({ players, onNextTurn, isCompact = false }: InitiativeTrackerProps) {
+export function InitiativeTracker({ players, onNextTurn, onMovePlayer, isCompact = false }: InitiativeTrackerProps) {
   if (players.length === 0) {
     return (
       <div className="card-surface p-6 text-center">
@@ -28,7 +29,7 @@ export function InitiativeTracker({ players, onNextTurn, isCompact = false }: In
         )}
       </div>
 
-      <div className={isCompact ? "flex flex-col gap-1.5" : "flex gap-2 overflow-x-auto pb-2 scrollbar-hide"}>
+      <div className={isCompact ? "flex flex-col gap-1.5" : "flex flex-col gap-1.5"}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => (
             <motion.div
@@ -43,17 +44,37 @@ export function InitiativeTracker({ players, onNextTurn, isCompact = false }: In
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className={`
-                ${isCompact ? "flex items-center gap-3 p-3" : "flex-shrink-0 w-28 p-3"}
+                flex items-center gap-3 p-3
                 rounded-xl bg-surface transition-all duration-200
                 ${player.isActive ? "card-active animate-pulse-gold" : ""}
               `}
             >
+              {/* Reorder buttons — DM only */}
+              {onMovePlayer && (
+                <div className="flex flex-col gap-0.5">
+                  <button
+                    onClick={() => onMovePlayer(player.id, 'up')}
+                    disabled={index === 0}
+                    className="p-0.5 rounded card-hover btn-press disabled:opacity-20"
+                  >
+                    <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
+                  <button
+                    onClick={() => onMovePlayer(player.id, 'down')}
+                    disabled={index === players.length - 1}
+                    className="p-0.5 rounded card-hover btn-press disabled:opacity-20"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
+                </div>
+              )}
+
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
                 player.isActive ? "bg-primary text-primary-foreground" : "bg-surface-hover text-muted-foreground"
               }`}>
                 {player.name[0]}
               </div>
-              <div className={isCompact ? "flex-1" : "mt-2"}>
+              <div className="flex-1">
                 <div className={`text-sm font-medium truncate ${player.isActive ? "text-foreground" : "text-muted-foreground"}`}>
                   {player.name}
                 </div>
@@ -70,8 +91,8 @@ export function InitiativeTracker({ players, onNextTurn, isCompact = false }: In
                   </div>
                 )}
               </div>
-              {player.isActive && isCompact && (
-                <ChevronRight className="w-4 h-4 text-primary" />
+              {player.isActive && (
+                <ChevronRight className="w-4 h-4 text-primary shrink-0" />
               )}
             </motion.div>
           ))}
