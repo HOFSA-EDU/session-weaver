@@ -94,6 +94,7 @@ export default function PlayerView() {
           type: a.asset_type as any,
           sharedWith: a.shared_with,
           createdAt: a.created_at,
+          folder: a.folder || null,
         }))} />
 
         <InitiativeTracker
