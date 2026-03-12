@@ -22,6 +22,8 @@ export default function PlayerView() {
   const currentPlayer = players.find(p => p.user_id === user?.id);
   const { data: notes = [] } = useSessionNotes(sessionId || null, currentPlayer?.id);
   const createNote = useCreateNote();
+  const updateNote = useUpdateNote();
+  const deleteNote = useDeleteNote();
   useSessionRealtime(sessionId || null);
 
   // Redirect player if kicked by DM
