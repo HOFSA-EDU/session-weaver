@@ -22,16 +22,18 @@ type MobileTab = 'initiative' | 'players' | 'assets' | 'notes' | 'effects';
 export default function DMDashboard() {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>('initiative');
   const [selectedPlayerEffects, setSelectedPlayerEffects] = useState<string | null>(null);
   const [shareAssetId, setShareAssetId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const dmAuthorId = user?.id || 'dm';
   const { data: session, isLoading: sessionLoading } = useSession(sessionId || null);
   const { data: players = [] } = useSessionPlayers(sessionId || null);
   const { data: assets = [] } = useSessionAssets(sessionId || null);
-  const { data: notes = [] } = useSessionNotes(sessionId || null, 'dm');
+  const { data: notes = [] } = useSessionNotes(sessionId || null, dmAuthorId);
   useSessionRealtime(sessionId || null);
 
   const updatePlayer = useUpdatePlayer();
