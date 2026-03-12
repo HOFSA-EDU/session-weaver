@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           description: string | null
           file_url: string | null
+          folder: string | null
           id: string
           session_id: string
           shared_with: string[]
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_url?: string | null
+          folder?: string | null
           id?: string
           session_id: string
           shared_with?: string[]
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_url?: string | null
+          folder?: string | null
           id?: string
           session_id?: string
           shared_with?: string[]

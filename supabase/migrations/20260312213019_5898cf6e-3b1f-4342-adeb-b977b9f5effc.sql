@@ -1,0 +1,1 @@
+ALTER TABLE public.session_assets ADD COLUMN folder text DEFAULT null;
