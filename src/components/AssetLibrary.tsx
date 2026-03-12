@@ -21,6 +21,7 @@ const typeColors: Record<string, string> = {
   letter: 'bg-amber-500/20 text-amber-400',
   clue: 'bg-emerald-500/20 text-emerald-400',
   handout: 'bg-purple-500/20 text-purple-400',
+  artefact: 'bg-rose-500/20 text-rose-400',
 };
 
 export function AssetLibrary({ assets, onUpload, onSendAsset }: AssetLibraryProps) {

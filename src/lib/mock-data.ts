@@ -11,7 +11,7 @@ export interface Asset {
   title: string;
   description: string;
   imageUrl: string;
-  type: 'map' | 'letter' | 'clue' | 'handout';
+  type: 'map' | 'letter' | 'clue' | 'handout' | 'artefact';
   sharedWith: string[]; // player ids, or ['all']
   createdAt: string;
 }
