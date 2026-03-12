@@ -19,8 +19,10 @@ export default function JoinSession() {
   // Check if already in this session
   const existingPlayer = players.find(p => p.user_id === user?.id);
 
+  const isInactive = session && !session.is_active;
+
   const handleJoin = async () => {
-    if (!session) return;
+    if (!session || isInactive) return;
 
     if (existingPlayer) {
       navigate(`/player/${session.id}`);
