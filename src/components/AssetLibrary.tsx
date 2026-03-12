@@ -198,6 +198,10 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType, onDe
         onClose={() => setPreviewAsset(null)}
         onUpdateType={onUpdateType ? handleUpdateType : undefined}
         onDeleteAsset={onDeleteAsset ? handleDeleteAsset : undefined}
+        onUpdateDescription={onUpdateDescription ? (assetId, desc) => {
+          onUpdateDescription(assetId, desc);
+          if (previewAsset?.id === assetId) setPreviewAsset({ ...previewAsset!, description: desc });
+        } : undefined}
       />
     </>
   );
