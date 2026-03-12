@@ -1,0 +1,1 @@
+ALTER TABLE public.session_players ADD COLUMN turn_order INTEGER NOT NULL DEFAULT 0;
