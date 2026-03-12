@@ -91,7 +91,14 @@ export function AssetLibrary({ assets, onUpload, onSendAsset, onUpdateType }: As
         )}
       </div>
 
-      <AssetPreview asset={previewAsset} onClose={() => setPreviewAsset(null)} />
+      <AssetPreview
+        asset={previewAsset}
+        onClose={() => setPreviewAsset(null)}
+        onUpdateType={onUpdateType ? (assetId, type) => {
+          onUpdateType(assetId, type);
+          if (previewAsset) setPreviewAsset({ ...previewAsset, type });
+        } : undefined}
+      />
     </>
   );
 }
