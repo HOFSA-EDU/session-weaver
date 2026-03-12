@@ -194,7 +194,7 @@ export default function DMDashboard() {
       createdAt: n.created_at,
       updatedAt: n.updated_at,
     })),
-    currentUserId: 'dm',
+    currentUserId: dmAuthorId,
     onAddNote: handleAddNote,
   };
 
