@@ -135,12 +135,11 @@ export default function DMDashboard() {
     players: players.map(p => ({
       id: p.id,
       name: p.player_name,
-      initiative: p.initiative,
+      initiative: null as number | null,
       statusEffects: p.status_effects,
       isActive: p.is_active,
     })),
     onNextTurn: handleNextTurn,
-    onAddCombatant: () => {},
   };
 
   const playerListProps = {
