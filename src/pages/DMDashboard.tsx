@@ -137,7 +137,7 @@ export default function DMDashboard() {
   const handleAddNote = async (content: string, type: 'personal' | 'session') => {
     await createNote.mutateAsync({
       session_id: session.id,
-      author_id: 'dm',
+      author_id: dmAuthorId,
       author_name: 'DM',
       content,
       note_type: type,
