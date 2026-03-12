@@ -10,6 +10,7 @@ interface AssetLibraryProps {
   onUpdateType?: (assetId: string, type: Asset['type']) => void;
   onDeleteAsset?: (assetId: string) => void;
   onMoveToFolder?: (assetId: string, folder: string | null) => void;
+  onUpdateDescription?: (assetId: string, description: string) => void;
 }
 
 const typeIcons: Record<string, React.ElementType> = {
