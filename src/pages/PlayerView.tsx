@@ -5,23 +5,23 @@ import { ReceivedAssets } from "@/components/ReceivedAssets";
 import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
+import { useAuth } from "@/hooks/use-auth";
 import { useTurnSound } from "@/hooks/use-turn-sound";
-import { getPlayerSession } from "@/lib/session-utils";
 import { ArrowLeft } from "lucide-react";
 
 export default function PlayerView() {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const playerInfo = getPlayerSession(sessionId || '');
+  const { user } = useAuth();
 
   const { data: session } = useSession(sessionId || null);
   const { data: players = [] } = useSessionPlayers(sessionId || null);
   const { data: assets = [] } = useSessionAssets(sessionId || null);
-  const { data: notes = [] } = useSessionNotes(sessionId || null, playerInfo?.playerId);
+  const currentPlayer = players.find(p => p.user_id === user?.id);
+  const { data: notes = [] } = useSessionNotes(sessionId || null, currentPlayer?.id);
   const createNote = useCreateNote();
   useSessionRealtime(sessionId || null);
 
-  const currentPlayer = players.find(p => p.id === playerInfo?.playerId);
   const activePlayer = players.find(p => p.is_active);
   const isMyTurn = currentPlayer?.is_active || false;
   const { soundEnabled, toggleSound } = useTurnSound(isMyTurn);

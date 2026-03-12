@@ -13,7 +13,7 @@ import {
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getDeviceId } from "@/lib/session-utils";
+import { useAuth } from "@/hooks/use-auth";
 import { Users, Swords, BookOpen, Image, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,16 +22,18 @@ type MobileTab = 'initiative' | 'players' | 'assets' | 'notes' | 'effects';
 export default function DMDashboard() {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>('initiative');
   const [selectedPlayerEffects, setSelectedPlayerEffects] = useState<string | null>(null);
   const [shareAssetId, setShareAssetId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const dmAuthorId = user?.id || 'dm';
   const { data: session, isLoading: sessionLoading } = useSession(sessionId || null);
   const { data: players = [] } = useSessionPlayers(sessionId || null);
   const { data: assets = [] } = useSessionAssets(sessionId || null);
-  const { data: notes = [] } = useSessionNotes(sessionId || null, 'dm');
+  const { data: notes = [] } = useSessionNotes(sessionId || null, dmAuthorId);
   useSessionRealtime(sessionId || null);
 
   const updatePlayer = useUpdatePlayer();
@@ -135,7 +137,7 @@ export default function DMDashboard() {
   const handleAddNote = async (content: string, type: 'personal' | 'session') => {
     await createNote.mutateAsync({
       session_id: session.id,
-      author_id: 'dm',
+      author_id: dmAuthorId,
       author_name: 'DM',
       content,
       note_type: type,
@@ -192,7 +194,7 @@ export default function DMDashboard() {
       createdAt: n.created_at,
       updatedAt: n.updated_at,
     })),
-    currentUserId: 'dm',
+    currentUserId: dmAuthorId,
     onAddNote: handleAddNote,
   };
 

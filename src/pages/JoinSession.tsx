@@ -2,25 +2,26 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSessionByCode, useJoinSession } from "@/hooks/use-session-data";
-import { getPlayerSession } from "@/lib/session-utils";
+import { useSessionByCode, useJoinSession, useSessionPlayers } from "@/hooks/use-session-data";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function JoinSession() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [joinCode, setJoinCode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
 
   const { data: session, isLoading: lookingUp } = useSessionByCode(joinCode.length >= 4 ? joinCode : null);
+  const { data: players = [] } = useSessionPlayers(session?.id || null);
   const joinSession = useJoinSession();
 
-  // Check if player already has a session token for this session
-  const existingPlayer = session ? getPlayerSession(session.id) : null;
+  // Check if already in this session
+  const existingPlayer = players.find(p => p.user_id === user?.id);
 
   const handleJoin = async () => {
     if (!session) return;
 
-    // If already joined, just navigate back
     if (existingPlayer) {
       navigate(`/player/${session.id}`);
       return;
