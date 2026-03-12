@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSessionByCode, useJoinSession } from "@/hooks/use-session-data";
+import { getPlayerSession } from "@/lib/session-utils";
 
 export default function JoinSession() {
   const navigate = useNavigate();
@@ -13,8 +14,19 @@ export default function JoinSession() {
   const { data: session, isLoading: lookingUp } = useSessionByCode(joinCode.length >= 4 ? joinCode : null);
   const joinSession = useJoinSession();
 
+  // Check if player already has a session token for this session
+  const existingPlayer = session ? getPlayerSession(session.id) : null;
+
   const handleJoin = async () => {
-    if (!session || !playerName.trim()) return;
+    if (!session) return;
+
+    // If already joined, just navigate back
+    if (existingPlayer) {
+      navigate(`/player/${session.id}`);
+      return;
+    }
+
+    if (!playerName.trim()) return;
     setError("");
     try {
       await joinSession.mutateAsync({ sessionId: session.id, playerName: playerName.trim() });
@@ -56,30 +68,35 @@ export default function JoinSession() {
               <div className="mt-2 p-3 rounded-lg bg-primary/10">
                 <p className="text-sm font-medium text-primary">{session.name}</p>
                 {session.description && <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>}
+                {existingPlayer && (
+                  <p className="text-xs text-primary/80 mt-1.5 font-medium">✦ You're already in this session — tap below to rejoin</p>
+                )}
               </div>
             )}
           </div>
 
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Character Name</label>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Aethon the Bold"
-              className="w-full bg-surface rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+          {!existingPlayer && (
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Character Name</label>
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Aethon the Bold"
+                className="w-full bg-surface rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          )}
 
           {error && <p className="text-xs text-crimson">{error}</p>}
 
           <button
             onClick={handleJoin}
-            disabled={!session || !playerName.trim() || joinSession.isPending}
+            disabled={!session || (!existingPlayer && !playerName.trim()) || joinSession.isPending}
             className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-medium btn-press transition-all hover:brightness-110 disabled:opacity-30 disabled:pointer-events-none mt-4"
           >
             <LogIn className="w-5 h-5" />
-            {joinSession.isPending ? 'Joining...' : 'Enter the Fray'}
+            {existingPlayer ? 'Rejoin Session' : joinSession.isPending ? 'Joining...' : 'Enter the Fray'}
           </button>
         </div>
       </motion.div>

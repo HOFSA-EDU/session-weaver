@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, TablesInsert } from "@/integrations/supabase/types";
-import { generateJoinCode, getDeviceId, setDMSession, setPlayerToken } from "@/lib/session-utils";
+import { generateJoinCode, getDeviceId, setDMSession, setPlayerToken, getAllPlayerSessions } from "@/lib/session-utils";
 import { useEffect } from "react";
 
 type Session = Tables<"sessions">;
@@ -69,6 +69,24 @@ export function useDMSessions() {
       const { data, error } = await supabase.from("sessions").select("*").in("id", dmSessions).order("created_at", { ascending: false });
       if (error) throw error;
       return data as Session[];
+    },
+  });
+}
+
+export function usePlayerSessions() {
+  const playerSessions = getAllPlayerSessions();
+  const sessionIds = playerSessions.map(p => p.sessionId);
+
+  return useQuery({
+    queryKey: ["player-sessions", sessionIds],
+    queryFn: async () => {
+      if (sessionIds.length === 0) return [];
+      const { data, error } = await supabase.from("sessions").select("*").in("id", sessionIds).order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data as Session[]).map(s => ({
+        ...s,
+        playerInfo: playerSessions.find(p => p.sessionId === s.id)!,
+      }));
     },
   });
 }

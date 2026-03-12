@@ -48,3 +48,22 @@ export function getPlayerSession(sessionId: string): { playerId: string; token: 
     return JSON.parse(localStorage.getItem(`arcane-table-player-${sessionId}`) || 'null');
   } catch { return null; }
 }
+
+// Get all stored player sessions (sessionId -> playerInfo)
+export function getAllPlayerSessions(): { sessionId: string; playerId: string; token: string }[] {
+  const results: { sessionId: string; playerId: string; token: string }[] = [];
+  const prefix = 'arcane-table-player-';
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) {
+      try {
+        const sessionId = key.slice(prefix.length);
+        const data = JSON.parse(localStorage.getItem(key) || 'null');
+        if (data?.playerId && data?.token) {
+          results.push({ sessionId, playerId: data.playerId, token: data.token });
+        }
+      } catch { /* skip */ }
+    }
+  }
+  return results;
+}
