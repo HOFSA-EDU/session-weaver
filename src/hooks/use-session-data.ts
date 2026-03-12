@@ -136,7 +136,7 @@ export function useJoinSession() {
       const { data: lastPlayer } = await supabase.from("session_players").select("turn_order").eq("session_id", sessionId).order("turn_order", { ascending: false }).limit(1);
       const nextOrder = (lastPlayer && lastPlayer.length > 0 ? lastPlayer[0].turn_order : -1) + 1;
       
-      const token = crypto.randomUUID();
+      const token = self.crypto?.randomUUID?.() ?? Array.from(self.crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
       const { data, error } = await supabase
         .from("session_players")
         .insert({ session_id: sessionId, player_name: playerName, player_token: token, turn_order: nextOrder, user_id: user.id })
