@@ -10,6 +10,7 @@ import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
 import {
   useSession, useSessionPlayers, useSessionAssets, useSessionNotes,
   useUpdatePlayer, useRemovePlayer, useCreateAsset, useUpdateAsset, useDeleteAsset, useCreateNote, useUpdateNote, useDeleteNote,
+  useUpdateSession, useDeleteSession,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -44,6 +45,8 @@ export default function DMDashboard() {
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
   const deleteNote = useDeleteNote();
+  const updateSession = useUpdateSession();
+  const deleteSession = useDeleteSession();
 
   if (sessionLoading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading session...</p></div>;
@@ -239,7 +242,7 @@ export default function DMDashboard() {
     return (
       <div className="h-screen flex flex-col">
         <input ref={fileInputRef} type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileChange} />
-        <SessionHeader session={{ id: session.id, name: session.name, description: session.description || '', joinCode: session.join_code, createdAt: session.created_at, isActive: session.is_active }} onBack={() => navigate("/")} />
+        <SessionHeader session={{ id: session.id, name: session.name, description: session.description || '', joinCode: session.join_code, createdAt: session.created_at, isActive: session.is_active }} onBack={() => navigate("/")} onToggleActive={() => updateSession.mutate({ id: session.id, is_active: !session.is_active })} onDeleteSession={() => { deleteSession.mutate(session.id, { onSuccess: () => navigate("/") }); }} />
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {activeTab === 'initiative' && <InitiativeTracker {...initiativeProps} isCompact />}
@@ -286,7 +289,7 @@ export default function DMDashboard() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <input ref={fileInputRef} type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileChange} />
-      <SessionHeader session={{ id: session.id, name: session.name, description: session.description || '', joinCode: session.join_code, createdAt: session.created_at, isActive: session.is_active }} onBack={() => navigate("/")} />
+      <SessionHeader session={{ id: session.id, name: session.name, description: session.description || '', joinCode: session.join_code, createdAt: session.created_at, isActive: session.is_active }} onBack={() => navigate("/")} onToggleActive={() => updateSession.mutate({ id: session.id, is_active: !session.is_active })} onDeleteSession={() => { deleteSession.mutate(session.id, { onSuccess: () => navigate("/") }); }} />
 
       <div className="flex-1 grid grid-cols-[280px_1fr_320px] gap-0 overflow-hidden">
         <div className="overflow-y-auto p-4 space-y-4">
