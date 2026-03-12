@@ -16,7 +16,7 @@ export default function PlayerView() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { user } = useAuth();
 
-  const { data: session } = useSession(sessionId || null);
+  const { data: session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId || null);
   const { data: players = [] } = useSessionPlayers(sessionId || null);
   const { data: assets = [] } = useSessionAssets(sessionId || null);
   const currentPlayer = players.find(p => p.user_id === user?.id);
@@ -55,10 +55,19 @@ export default function PlayerView() {
     });
   };
 
-  if (!session) {
+  if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center flex-col gap-4">
         <p className="text-muted-foreground">Loading session...</p>
+      </div>
+    );
+  }
+
+  if (!session || sessionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+        <p className="text-muted-foreground">This session no longer exists.</p>
+        <button onClick={() => navigate("/")} className="px-4 py-2 rounded-lg bg-surface card-hover btn-press text-sm">Back to Home</button>
       </div>
     );
   }
