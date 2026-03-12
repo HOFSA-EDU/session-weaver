@@ -11,9 +11,12 @@ interface NotesPanelProps {
 export function NotesPanel({ notes, currentUserId, onAddNote }: NotesPanelProps) {
   const [newNote, setNewNote] = useState("");
   const [noteType, setNoteType] = useState<'personal' | 'session'>('session');
+  const [filter, setFilter] = useState<'all' | 'session' | 'personal'>('all');
 
   const visibleNotes = notes.filter(
     n => n.type === 'session' || n.authorId === currentUserId
+  ).filter(
+    n => filter === 'all' || n.type === filter
   );
 
   const handleSubmit = () => {
