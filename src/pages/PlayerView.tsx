@@ -5,7 +5,7 @@ import { InitiativeTracker } from "@/components/InitiativeTracker";
 import { ReceivedAssets } from "@/components/ReceivedAssets";
 import { NotesPanel } from "@/components/NotesPanel";
 import { StatusEffectsPanel } from "@/components/StatusEffectsPanel";
-import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useSessionRealtime } from "@/hooks/use-session-data";
+import { useSession, useSessionPlayers, useSessionAssets, useSessionNotes, useCreateNote, useUpdateNote, useDeleteNote, useSessionRealtime } from "@/hooks/use-session-data";
 import { useAuth } from "@/hooks/use-auth";
 import { useTurnSound } from "@/hooks/use-turn-sound";
 import { useStatusEffectSound } from "@/hooks/use-status-effect-sound";
