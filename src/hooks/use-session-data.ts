@@ -215,6 +215,18 @@ export function useUpdateAsset() {
   });
 }
 
+export function useDeleteAsset() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, sessionId }: { id: string; sessionId: string }) => {
+      const { error } = await supabase.from("session_assets").delete().eq("id", id);
+      if (error) throw error;
+      return { sessionId };
+    },
+    onSuccess: (data) => queryClient.invalidateQueries({ queryKey: ["session-assets", data.sessionId] }),
+  });
+}
+
 // ===== NOTES HOOKS =====
 
 export function useSessionNotes(sessionId: string | null, authorId?: string) {

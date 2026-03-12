@@ -14,6 +14,7 @@ export interface Asset {
   type: 'map' | 'letter' | 'clue' | 'handout' | 'artefact';
   sharedWith: string[]; // player ids, or ['all']
   createdAt: string;
+  folder: string | null;
 }
 
 export interface Note {
