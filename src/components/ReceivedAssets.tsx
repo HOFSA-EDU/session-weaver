@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Asset } from "@/lib/mock-data";
 import { Map, FileText, Search as SearchIcon, Eye, Sparkles } from "lucide-react";
 import { AssetPreview } from "@/components/AssetPreview";
