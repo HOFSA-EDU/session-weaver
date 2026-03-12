@@ -217,7 +217,14 @@ export default function DMDashboard() {
       updatedAt: n.updated_at,
     })),
     currentUserId: dmAuthorId,
+    isDM: true,
     onAddNote: handleAddNote,
+    onEditNote: (noteId: string, content: string) => {
+      updateNote.mutate({ id: noteId, sessionId: session.id, content });
+    },
+    onDeleteNote: (noteId: string) => {
+      deleteNote.mutate({ id: noteId, sessionId: session.id });
+    },
   };
 
   const tabs: { id: MobileTab; icon: React.ElementType; label: string }[] = [
