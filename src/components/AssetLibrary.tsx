@@ -7,6 +7,7 @@ interface AssetLibraryProps {
   assets: Asset[];
   onUpload?: () => void;
   onSendAsset?: (assetId: string) => void;
+  onUpdateType?: (assetId: string, type: Asset['type']) => void;
 }
 
 const typeIcons: Record<string, React.ElementType> = {
