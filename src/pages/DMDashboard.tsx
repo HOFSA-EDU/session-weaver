@@ -110,7 +110,7 @@ export default function DMDashboard() {
         session_id: sessionId,
         title: file.name.replace(/\.[^/.]+$/, ''),
         file_url: url,
-        asset_type: file.type.startsWith('image/') ? 'map' : 'handout',
+        asset_type: 'handout',
         shared_with: [],
       });
       toast.success("Asset uploaded");
