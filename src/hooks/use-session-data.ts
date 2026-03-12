@@ -73,6 +73,24 @@ export function useDMSessions() {
   });
 }
 
+export function usePlayerSessions() {
+  const playerSessions = getAllPlayerSessions();
+  const sessionIds = playerSessions.map(p => p.sessionId);
+
+  return useQuery({
+    queryKey: ["player-sessions", sessionIds],
+    queryFn: async () => {
+      if (sessionIds.length === 0) return [];
+      const { data, error } = await supabase.from("sessions").select("*").in("id", sessionIds).order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data as Session[]).map(s => ({
+        ...s,
+        playerInfo: playerSessions.find(p => p.sessionId === s.id)!,
+      }));
+    },
+  });
+}
+
 export function useUpdateSession() {
   const queryClient = useQueryClient();
   return useMutation({
