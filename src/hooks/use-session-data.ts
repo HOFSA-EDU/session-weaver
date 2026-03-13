@@ -9,6 +9,22 @@ type SessionPlayer = Tables<"session_players">;
 type SessionAsset = Tables<"session_assets">;
 type SessionNote = Tables<"session_notes">;
 
+function createSafeUuid() {
+  const browserCrypto = globalThis.crypto as Crypto | undefined;
+
+  if (typeof browserCrypto?.randomUUID === "function") {
+    return browserCrypto.randomUUID();
+  }
+
+  if (typeof browserCrypto?.getRandomValues === "function") {
+    return Array.from(browserCrypto.getRandomValues(new Uint8Array(16)))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 // ===== SESSION HOOKS =====
 
 export function useCreateSession() {
@@ -153,7 +169,7 @@ export function useJoinSession() {
       const { data: lastPlayer } = await supabase.from("session_players").select("turn_order").eq("session_id", sessionId).order("turn_order", { ascending: false }).limit(1);
       const nextOrder = (lastPlayer && lastPlayer.length > 0 ? lastPlayer[0].turn_order : -1) + 1;
       
-      const token = self.crypto?.randomUUID?.() ?? Array.from(self.crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
+      const token = createSafeUuid();
       const { data, error } = await supabase
         .from("session_players")
         .insert({ session_id: sessionId, player_name: playerName, player_token: token, turn_order: nextOrder, user_id: user.id })
@@ -328,8 +344,8 @@ export function useSessionRealtime(sessionId: string | null) {
 // ===== UPLOAD =====
 
 export async function uploadAssetFile(sessionId: string, file: File): Promise<string> {
-  const ext = file.name.split('.').pop();
-  const uuid = (crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join(''));
+  const ext = file.name.split('.').pop() || 'bin';
+  const uuid = createSafeUuid();
   const path = `${sessionId}/${uuid}.${ext}`;
   const { error } = await supabase.storage.from('session-assets').upload(path, file);
   if (error) throw error;
