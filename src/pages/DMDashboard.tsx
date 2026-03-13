@@ -13,6 +13,7 @@ import {
   useUpdateSession, useDeleteSession,
   useSessionRealtime, uploadAssetFile,
 } from "@/hooks/use-session-data";
+import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/use-auth";
 import { Users, Swords, BookOpen, Image, Shield } from "lucide-react";
