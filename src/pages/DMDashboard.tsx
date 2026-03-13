@@ -117,7 +117,15 @@ export default function DMDashboard() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !sessionId) return;
+
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        toast.error("Please sign in again to upload assets.");
+        navigate("/auth");
+        return;
+      }
+
       const url = await uploadAssetFile(sessionId, file);
       await createAsset.mutateAsync({
         session_id: sessionId,
@@ -126,11 +134,14 @@ export default function DMDashboard() {
         asset_type: 'handout',
         shared_with: [],
       });
+
       toast.success("Asset uploaded");
     } catch (err) {
-      toast.error("Upload failed");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Upload failed: ${message}`);
+    } finally {
+      e.target.value = '';
     }
-    e.target.value = '';
   };
 
   const handleSendAsset = (assetId: string) => {
@@ -139,7 +150,7 @@ export default function DMDashboard() {
 
   const handleShareConfirm = async (targetIds: string[]) => {
     if (!shareAssetId) return;
-    const { error } = await (await import("@/integrations/supabase/client")).supabase
+    const { error } = await supabase
       .from("session_assets").update({ shared_with: targetIds }).eq("id", shareAssetId);
     if (!error) {
       toast.success(targetIds.includes('all') ? "Sent to party" : `Sent to ${targetIds.length} player${targetIds.length !== 1 ? 's' : ''}`);
