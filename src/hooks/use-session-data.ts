@@ -344,7 +344,7 @@ export function useSessionRealtime(sessionId: string | null) {
 // ===== UPLOAD =====
 
 export async function uploadAssetFile(sessionId: string, file: File): Promise<string> {
-  const ext = file.name.split('.').pop();
+  const ext = file.name.split('.').pop() || 'bin';
   const uuid = createSafeUuid();
   const path = `${sessionId}/${uuid}.${ext}`;
   const { error } = await supabase.storage.from('session-assets').upload(path, file);
