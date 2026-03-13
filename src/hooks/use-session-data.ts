@@ -9,6 +9,22 @@ type SessionPlayer = Tables<"session_players">;
 type SessionAsset = Tables<"session_assets">;
 type SessionNote = Tables<"session_notes">;
 
+function createSafeUuid() {
+  const browserCrypto = globalThis.crypto as Crypto | undefined;
+
+  if (typeof browserCrypto?.randomUUID === "function") {
+    return browserCrypto.randomUUID();
+  }
+
+  if (typeof browserCrypto?.getRandomValues === "function") {
+    return Array.from(browserCrypto.getRandomValues(new Uint8Array(16)))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 // ===== SESSION HOOKS =====
 
 export function useCreateSession() {
