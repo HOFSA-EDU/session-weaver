@@ -345,7 +345,7 @@ export function useSessionRealtime(sessionId: string | null) {
 
 export async function uploadAssetFile(sessionId: string, file: File): Promise<string> {
   const ext = file.name.split('.').pop();
-  const uuid = (crypto.randomUUID?.() ?? Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join(''));
+  const uuid = createSafeUuid();
   const path = `${sessionId}/${uuid}.${ext}`;
   const { error } = await supabase.storage.from('session-assets').upload(path, file);
   if (error) throw error;
