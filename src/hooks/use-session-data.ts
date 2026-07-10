@@ -153,9 +153,16 @@ export function useJoinSession() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ sessionId, playerName }: { sessionId: string; playerName: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      
+      let { data: { user } } = await supabase.auth.getUser();
+
+      // Guests can join without an account — sign in anonymously so RLS allows the insert
+      if (!user) {
+        const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
+        if (anonErr) throw anonErr;
+        user = anonData.user;
+        if (!user) throw new Error("Could not create guest session");
+      }
+
       // Check if already joined
       const { data: existing } = await supabase
         .from("session_players")

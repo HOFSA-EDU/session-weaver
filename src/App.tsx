@@ -13,32 +13,24 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function DMRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   }
-  if (!user) return <Navigate to="/auth" replace />;
-  return <>{children}</>;
-}
-
-function AuthRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
-  }
-  if (user) return <Navigate to="/" replace />;
+  // Requires a full (non-anonymous) account
+  if (!user || (user as any).is_anonymous) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 }
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-    <Route path="/" element={<ProtectedRoute><Landing /></ProtectedRoute>} />
-    <Route path="/create" element={<ProtectedRoute><CreateSession /></ProtectedRoute>} />
-    <Route path="/dm/:sessionId" element={<ProtectedRoute><DMDashboard /></ProtectedRoute>} />
-    <Route path="/join" element={<ProtectedRoute><JoinSession /></ProtectedRoute>} />
-    <Route path="/player/:sessionId" element={<ProtectedRoute><PlayerView /></ProtectedRoute>} />
+    <Route path="/auth" element={<Auth />} />
+    <Route path="/" element={<Landing />} />
+    <Route path="/join" element={<JoinSession />} />
+    <Route path="/player/:sessionId" element={<PlayerView />} />
+    <Route path="/create" element={<DMRoute><CreateSession /></DMRoute>} />
+    <Route path="/dm/:sessionId" element={<DMRoute><DMDashboard /></DMRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
