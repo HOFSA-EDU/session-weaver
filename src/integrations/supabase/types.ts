@@ -190,7 +190,48 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_read_note: {
+        Args: {
+          _author_id: string
+          _note_type: string
+          _session_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      can_write_note: {
+        Args: { _author_id: string; _session_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_session_owner: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_session_participant: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
+      lookup_session_by_code: {
+        Args: { _code: string }
+        Returns: {
+          combat_started: boolean
+          created_at: string
+          creator_id: string
+          current_turn_player_id: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          join_code: string
+          name: string
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "sessions"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never

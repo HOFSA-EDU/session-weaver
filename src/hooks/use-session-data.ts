@@ -64,9 +64,10 @@ export function useSessionByCode(code: string | null) {
     queryKey: ["session-code", code],
     queryFn: async () => {
       if (!code) return null;
-      const { data, error } = await supabase.from("sessions").select("*").eq("join_code", code.toUpperCase()).single();
+      const { data, error } = await supabase.rpc("lookup_session_by_code", { _code: code.toUpperCase() });
       if (error) throw error;
-      return data as Session;
+      const row = Array.isArray(data) ? data[0] : data;
+      return (row ?? null) as Session | null;
     },
     enabled: !!code,
   });
