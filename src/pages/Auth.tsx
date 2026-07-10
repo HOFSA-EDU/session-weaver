@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Swords, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Swords, Mail, Lock, ArrowRight, Loader2, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -112,6 +112,29 @@ export default function Auth() {
           >
             {isLogin ? "Sign up" : "Sign in"}
           </button>
+        </p>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-background px-3 text-[11px] uppercase tracking-wider text-muted-foreground">
+              Just here to play?
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate("/join")}
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-surface text-foreground font-medium btn-press card-hover"
+        >
+          <LogIn className="w-5 h-5" />
+          Join a Session
+        </button>
+        <p className="text-[11px] text-muted-foreground text-center mt-2">
+          No account needed — just a session code.
         </p>
       </motion.div>
     </div>
