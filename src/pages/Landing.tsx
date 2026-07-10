@@ -7,12 +7,18 @@ import { useAuth } from "@/hooks/use-auth";
 export default function Landing() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const isFullAccount = !!user && !(user as any).is_anonymous;
   const { data: dmSessions } = useMySessions();
   const { data: playerSessions } = useMyPlayerSessions();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
+  };
+
+  const handleCreate = () => {
+    if (isFullAccount) navigate("/create");
+    else navigate("/auth");
   };
 
   return (
@@ -34,7 +40,7 @@ export default function Landing() {
 
         <div className="space-y-3">
           <button
-            onClick={() => navigate("/create")}
+            onClick={handleCreate}
             className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-medium btn-press transition-all hover:brightness-110"
           >
             <Plus className="w-5 h-5" />
@@ -49,6 +55,12 @@ export default function Landing() {
             Join Session
           </button>
         </div>
+
+        {!isFullAccount && (
+          <p className="text-[11px] text-muted-foreground mt-3">
+            Creating a session requires an account. Joining does not.
+          </p>
+        )}
 
         {/* Player sessions - rejoin */}
         {playerSessions && playerSessions.length > 0 && (
@@ -79,7 +91,7 @@ export default function Landing() {
         )}
 
         {/* DM sessions */}
-        {dmSessions && dmSessions.length > 0 && (
+        {isFullAccount && dmSessions && dmSessions.length > 0 && (
           <div className="mt-10">
             <h2 className="font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2 justify-center">
               <History className="w-4 h-4" /> DM Sessions
@@ -107,10 +119,18 @@ export default function Landing() {
         )}
 
         <div className="mt-8 flex flex-col items-center gap-2">
-          <p className="text-[11px] text-muted-foreground">{user?.email}</p>
-          <button onClick={handleSignOut} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <LogOut className="w-3.5 h-3.5" /> Sign out
-          </button>
+          {isFullAccount ? (
+            <>
+              <p className="text-[11px] text-muted-foreground">{user?.email}</p>
+              <button onClick={handleSignOut} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <LogOut className="w-3.5 h-3.5" /> Sign out
+              </button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/auth")} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+              <LogIn className="w-3.5 h-3.5" /> Sign in as DM
+            </button>
+          )}
         </div>
       </motion.div>
     </div>
